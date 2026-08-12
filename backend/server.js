@@ -16,8 +16,20 @@ const PORT = process.env.PORT || 5000;
 
 // ─── Security & Parsing Middleware ───────────────────────────────────────────
 app.use(helmet());
+const allowedOrigins = [
+  process.env.CLIENT_URL || 'http://localhost:5173',
+  /\.vercel\.app$/,   // any Vercel preview URL
+  /\.netlify\.app$/,  // any Netlify URL
+];
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile, curl, Postman)
+    if (!origin) return callback(null, true);
+    const allowed = allowedOrigins.some(o =>
+      typeof o === 'string' ? o === origin : o.test(origin)
+    );
+    callback(null, allowed || process.env.NODE_ENV !== 'production');
+  },
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
