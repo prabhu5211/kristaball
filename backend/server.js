@@ -17,10 +17,12 @@ const PORT = process.env.PORT || 5000;
 // ─── Security & Parsing Middleware ───────────────────────────────────────────
 app.use(helmet());
 const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
-  /\.vercel\.app$/,   // any Vercel preview URL
-  /\.netlify\.app$/,  // any Netlify URL
-];
+  'http://localhost:5173',
+  'https://kristaball.vercel.app',
+  process.env.CLIENT_URL,
+  /\.vercel\.app$/,
+  /\.netlify\.app$/,
+].filter(Boolean);
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile, curl, Postman)
